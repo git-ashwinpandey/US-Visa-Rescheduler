@@ -1,24 +1,15 @@
 import re
-import traceback
 from datetime import datetime
 from time import sleep
 
-import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.chrome import ChromeDriverManager
 
-from request_tracker import RequestTracker
 from reschedule import get_chrome_driver, login
 from settings import *
 
-
-
-def get_dates_from_payment_page(driver: WebDriver) -> None:
+def get_dates_from_payment_page(driver):
     timeout = TIMEOUT
     continue_button = WebDriverWait(driver, timeout).until(
         EC.element_to_be_clickable((By.LINK_TEXT, "Continue"))
@@ -33,43 +24,28 @@ def get_dates_from_payment_page(driver: WebDriver) -> None:
         EC.visibility_of_element_located((By.CLASS_NAME, "for-layout"))
     )
     text_elements = content_table.find_elements(By.TAG_NAME, "td")
-    loc_str_array = [e.text for i,e in enumerate(text_elements) if i%2==0]
-    date_str_array = [e.text for i,e in enumerate(text_elements) if i%2==1]
+    loc_str_array = [e.text for i, e in enumerate(text_elements) if i % 2 == 0]
+    date_str_array = [e.text for i, e in enumerate(text_elements) if i % 2 == 1]
     return loc_str_array, date_str_array
 
+def detect_and_notify(loc_str_array, date_str_array):
+    earliest_acceptable_date = datetime.strptime(EARLIEST_ACCEPTABLE_DATE, "%Y-%m-%d").date()
+    latest_acceptable_date = datetime.strptime(LATEST_ACCEPTABLE_DATE, "%Y-%m-%d").date()
 
-def detect_and_notify(loc_str_array: list, date_str_array: list) -> bool:
-    earliest_acceptable_date = datetime.strptime(
-        EARLIEST_ACCEPTABLE_DATE, "%Y-%m-%d"
-    ).date()
-    latest_acceptable_date = datetime.strptime(
-        LATEST_ACCEPTABLE_DATE, "%Y-%m-%d"
-    ).date()
-
-    length = len(loc_str_array)
     detected = False
-    for i in range(length):
-        loc_str = loc_str_array[i]
-        date_str = date_str_array[i]
+    for loc_str, date_str in zip(loc_str_array, date_str_array):
         if date_str == "No Appointments Available":
             continue
-        date = datetime.strptime(
-            date_str, "%d %B, %Y"
-        ).date()
+        date = datetime.strptime(date_str, "%d %B, %Y").date()
         
         if earliest_acceptable_date <= date <= latest_acceptable_date:
-            print(
-                f"{datetime.now().strftime('%H:%M:%S')} FOUND SLOT ON {date}, location: {loc_str}!!!, sending email..."
-            )
+            print(f"{datetime.now().strftime('%H:%M:%S')} FOUND SLOT ON {date}, location: {loc_str}!!!, sending email...")
             detected = True
         else:
-            print(
-                f"{datetime.now().strftime('%H:%M:%S')} Earliest available date is {date}, location: {loc_str}"
-            )
+            print(f"{datetime.now().strftime('%H:%M:%S')} Earliest available date is {date}, location: {loc_str}")
     return detected
 
-
-def detect_with_new_session() -> bool:
+def detect_with_new_session():
     driver = get_chrome_driver()
     session_failures = 0
     detected = False
@@ -83,14 +59,11 @@ def detect_with_new_session() -> bool:
             print("Unable to get payment page: ", e)
             session_failures += 1
             sleep(FAIL_RETRY_DELAY)
-            continue
     driver.quit()
     return detected
 
-
 if __name__ == "__main__":
     session_count = 0
-
     while True:
         session_count += 1
         print(f"Attempting with new session #{session_count}")
