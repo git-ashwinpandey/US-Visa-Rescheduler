@@ -68,16 +68,26 @@ def legacy_reschedule(driver):
             # Confirm rescheduling if not in test mode
             if not TEST_MODE:
                 confirm = WebDriverWait(driver, 10).until(
-                    EC.element_to_be_clickable((By.CSS_SELECTOR, "a.button.alert[data-confirm='Confirm']"))
+                    EC.element_to_be_clickable((By.CSS_SELECTOR, "a.button.alert"))
                 )
                 confirm.click()
 
                 # Wait for the confirmation dialog to close
-                WebDriverWait(driver, 10).until(
-                    EC.invisibility_of_element_located((By.CSS_SELECTOR, "[data-confirm-title]"))
+                WebDriverWait(driver, 30).until(
+                    EC.invisibility_of_element_located((By.CSS_SELECTOR, "a.button.alert"))
                 )
+            # Locate the div with the specific class and ID
+            message_div = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, "div#flash_messages.learnMorePopUp"))
+            )
 
-            print(f"Successfully rescheduled for {available_in_months} months from now!")
+            # Extract the text from the first <p> tag inside this div
+            success_message = message_div.find_element(By.CSS_SELECTOR, "div.learn_more > p").text
+            print(success_message)
+            # Check if "successfully" is in the message
+            if "successfully" in success_message:
+                #print("success")
+                print(f"Successfully rescheduled for {available_in_months} months from now!")
             return
 
         except (TimeoutException, NoSuchElementException, ElementClickInterceptedException) as e:
