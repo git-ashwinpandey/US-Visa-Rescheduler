@@ -1,15 +1,32 @@
-import re
+import requests
 from datetime import datetime
 from time import sleep
 
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.chrome import ChromeDriverManager
 
+from request_tracker import RequestTracker
 from reschedule import get_chrome_driver, login
 from settings import *
 
-def get_dates_from_payment_page(driver):
+def get_dates_from_payment_page(driver: WebDriver) -> tuple[list, list]:
+    """
+    Navigate to the payment page and retrieve available appointment dates and locations.
+    
+    Args:
+        driver (WebDriver): The Selenium WebDriver instance.
+    
+    Returns:
+        tuple: A tuple containing two lists:
+               - loc_str_array: List of locations
+               - date_str_array: List of corresponding appointment dates
+    """
+    
     timeout = TIMEOUT
     continue_button = WebDriverWait(driver, timeout).until(
         EC.element_to_be_clickable((By.LINK_TEXT, "Continue"))
@@ -28,7 +45,18 @@ def get_dates_from_payment_page(driver):
     date_str_array = [e.text for i, e in enumerate(text_elements) if i % 2 == 1]
     return loc_str_array, date_str_array
 
-def detect_and_notify(loc_str_array, date_str_array):
+def detect_and_notify(loc_str_array: list, date_str_array: list) -> bool:
+    """
+    Detect available appointment slots and notify if they fall within the acceptable date range.
+    
+    Args:
+        loc_str_array (list): List of locations.
+        date_str_array (list): List of corresponding appointment dates.
+    
+    Returns:
+        bool: True if an acceptable slot is detected, False otherwise.
+    """
+
     earliest_acceptable_date = datetime.strptime(EARLIEST_ACCEPTABLE_DATE, "%Y-%m-%d").date()
     latest_acceptable_date = datetime.strptime(LATEST_ACCEPTABLE_DATE, "%Y-%m-%d").date()
 
@@ -45,7 +73,13 @@ def detect_and_notify(loc_str_array, date_str_array):
             print(f"{datetime.now().strftime('%H:%M:%S')} Earliest available date is {date}, location: {loc_str}")
     return detected
 
-def detect_with_new_session():
+def detect_with_new_session() -> bool:
+    """
+    Create a new browser session to detect appointment availability and notify.
+    
+    Returns:
+        bool: True if an acceptable slot is detected, False otherwise.
+    """
     driver = get_chrome_driver()
     session_failures = 0
     detected = False
@@ -64,6 +98,7 @@ def detect_with_new_session():
 
 if __name__ == "__main__":
     session_count = 0
+    
     while True:
         session_count += 1
         print(f"Attempting with new session #{session_count}")
