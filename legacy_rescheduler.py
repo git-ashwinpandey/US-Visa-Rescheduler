@@ -6,6 +6,23 @@ from time import sleep
 from settings import TEST_MODE
 
 def legacy_reschedule(driver):
+    """
+    Attempts to reschedule an appointment using a web automation script via Selenium.
+
+    The script searches for the nearest available date and time slot, selects them,
+    and submits the rescheduling request. Retries the process up to 3 times in case of failure.
+
+    Parameters:
+    - driver (webdriver): A Selenium WebDriver instance controlling the browser.
+
+    Returns:
+    - None. Prints success or failure messages depending on the outcome.
+
+    Raises:
+    - TimeoutException, NoSuchElementException, ElementClickInterceptedException: 
+      If any issues occur during the process.
+    """
+
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -17,28 +34,43 @@ def legacy_reschedule(driver):
             )
             date_input.click()
 
-            # Function to move to next month in the datepicker
             def next_month():
+                """
+                Clicks the next month button in the datepicker.
+                """
                 next_button = WebDriverWait(driver, 5).until(
                     EC.element_to_be_clickable((By.CSS_SELECTOR, ".ui-datepicker-next"))
                 )
                 next_button.click()
 
-            # Check if available date in current month
             def cur_month_ava():
+                """
+                Checks if there are any available dates in the current month.
+
+                Returns:
+                - bool: True if available dates exist, False otherwise.
+                """
                 calendar = WebDriverWait(driver, 5).until(
                     EC.presence_of_element_located((By.ID, "ui-datepicker-div"))
                 )
                 dates = calendar.find_elements(By.CSS_SELECTOR, "td:not(.ui-datepicker-unselectable)")
                 return len(dates) > 0
 
-            # Find nearest available month
             def nearest_ava():
+                """
+                Finds the nearest available month with at least one available date.
+
+                Returns:
+                - int: The number of months from the current month to the nearest available date.
+                
+                Raises:
+                - Exception: If no available dates are found within 16 months.
+                """
                 ava_in = 0
                 while not cur_month_ava():
                     next_month()
                     ava_in += 1
-                    if ava_in > 16:  # Limit to prevent infinite loop
+                    if ava_in > 16: 
                         raise Exception("No available dates found within 12 months")
                 return ava_in
 
@@ -50,7 +82,8 @@ def legacy_reschedule(driver):
             )
             available_date.click()
             sleep(3)
-            # Wait for and select the time
+
+            # Select the time
             time_select = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, "appointments_consulate_appointment_time"))
             )
@@ -81,20 +114,19 @@ def legacy_reschedule(driver):
                 EC.presence_of_element_located((By.CSS_SELECTOR, "div#flash_messages.learnMorePopUp"))
             )
 
-            # Extract the text from the first <p> tag inside this div
+            
             success_message = message_div.find_element(By.CSS_SELECTOR, "div.learn_more > p").text
-            print(success_message)
-            # Check if "successfully" is in the message
             if "successfully" in success_message:
-                #print("success")
                 print(f"Successfully rescheduled for {available_in_months} months from now!")
+            else:
+                print("Rescheduling failed. The date may have been taken by someone else.")
             return
 
         except (TimeoutException, NoSuchElementException, ElementClickInterceptedException) as e:
             print(f"Rescheduling attempt {attempt + 1} failed: {str(e)}")
             if attempt < max_retries - 1:
                 print("Retrying...")
-                sleep(5)  # Wait before retrying
+                sleep(5)
             else:
                 print("Max retries reached. Rescheduling failed.")
                 raise
