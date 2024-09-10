@@ -121,7 +121,7 @@ class SettingsGUI:
         # Other Settings
         ttk.Label(self.master, text="Other Settings", font=("TkDefaultFont", 12, "bold")).grid(row=12, column=0, columnspan=2, pady=10)
         self.show_gui = tk.BooleanVar(value=self.settings.get("SHOW_GUI", True))
-        ttk.Checkbutton(self.master, text="Show GUI", variable=self.show_gui).grid(row=13, column=0, columnspan=2, pady=2)
+        ttk.Checkbutton(self.master, text="Headless mode", variable=self.show_gui).grid(row=13, column=0, columnspan=2, pady=2)
 
         self.test_mode = tk.BooleanVar(value=self.settings.get("TEST_MODE", True))
         ttk.Checkbutton(self.master, text="Test Mode", variable=self.test_mode).grid(row=14, column=0, columnspan=2, pady=2)
