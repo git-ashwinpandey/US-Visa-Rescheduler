@@ -11,7 +11,7 @@ class SettingsGUI:
     def __init__(self, master):
         self.master = master
         master.title("Visa Appointment Rescheduler Settings")
-        master.geometry("550x1000")  # Increased height to accommodate new buttons
+        master.geometry("500x900") 
 
         self.settings = self.load_settings()
         self.dependencies = ["requests", "selenium", "webdriver_manager"]
@@ -52,14 +52,15 @@ class SettingsGUI:
             }
 
     def save_settings(self):
-    # Collect user settings
+    # Get settings from the GUI
         settings = {
             "USER_EMAIL": self.user_email.get(),
             "USER_PASSWORD": self.user_password.get(),
             "EARLIEST_ACCEPTABLE_DATE": self.earliest_date.get(),
             "LATEST_ACCEPTABLE_DATE": self.latest_date.get(),
             "SHOW_GUI": self.show_gui.get(),
-            "TEST_MODE": self.test_mode.get()
+            "TEST_MODE": self.test_mode.get(),
+            "SELECTED_CITY": self.selected_city.get()
         }
 
         # Validate dates
@@ -73,11 +74,25 @@ class SettingsGUI:
             messagebox.showerror("Error", "Invalid date format. Please use YYYY-MM-DD.")
             return
 
-        # Collect developer settings
+        
         dev_settings = {setting: self.dev_vars[setting].get() for setting in self.dev_vars}
         settings.update(dev_settings)
 
-        # Save combined settings to a JSON file
+        # Map city to value and update the suffix
+        city_values = {
+            "Calgary": 89,
+            "Halifax": 90,
+            "Montreal": 91,
+            "Ottawa": 92,
+            "Quebec City": 93,
+            "Toronto": 94,
+            "Vancouver": 95
+        }
+
+        selected_city_value = city_values.get(self.selected_city.get(), 94)
+        settings["AVAILABLE_DATE_REQUEST_SUFFIX"] = f"/days/{selected_city_value}.json?appointments[expedite]=false"
+
+        # Save settings to file
         with open('settings.json', 'w') as f:
             json.dump(settings, f, indent=4)
         messagebox.showinfo("Success", "Settings saved successfully!")
@@ -117,7 +132,6 @@ class SettingsGUI:
         self.dependency_buttons_frame = tk.Frame(self.master)
         self.dependency_buttons_frame.grid(row=20, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
-        # Create a dictionary to store the buttons
         self.dependency_buttons = {}
 
         for i, dep in enumerate(self.dependencies):
@@ -135,7 +149,6 @@ class SettingsGUI:
 
             button.grid(row=0, column=i, padx=5) 
 
-            # Store the button in the dictionary
             self.dependency_buttons[dep] = button
 
 
@@ -152,7 +165,7 @@ class SettingsGUI:
         ttk.Label(self.dev_frame, text="Developer Options", font=("TkDefaultFont", 12, "bold")).grid(row=0, column=0, columnspan=2, pady=10)
 
         self.create_dev_widgets()
-
+        self.create_city_dropdown()
         # Save and Start Buttons
         save_start_frame = ttk.Frame(self.master)
         save_start_frame.grid(row=25, column=0, columnspan=2, pady=10)
@@ -166,6 +179,18 @@ class SettingsGUI:
 
         # Center the frame in its grid cell
         save_start_frame.grid_columnconfigure(0, weight=1)
+
+    def create_city_dropdown(self):
+        """Creates a dropdown menu for city selection."""
+        cities = ["Calgary", "Halifax", "Montreal", "Ottawa", "Quebec City", "Toronto", "Vancouver"]
+        self.selected_city = tk.StringVar()
+        self.selected_city.set(cities[5])
+
+        ttk.Label(self.master, text="Select City:").grid(row=10, column=0, sticky="e", padx=5, pady=2)
+
+        city_dropdown = ttk.OptionMenu(self.master, self.selected_city, cities[5], *cities)
+        city_dropdown.grid(row=10, column=1, pady=2)
+        city_dropdown.config(width=35, style="TMenubutton")
 
     def toggle_dev_section(self):
         """Toggle visibility of developer options section."""
@@ -229,7 +254,6 @@ class SettingsGUI:
             subprocess.check_call([sys.executable, "-m", "pip", "install", package])
             messagebox.showinfo("Success", f"{package} has been successfully installed.")
             
-            # Refresh all dependency buttons after installation
             for dep in self.dependencies:
                 self.update_dependency_button(dep)
 
