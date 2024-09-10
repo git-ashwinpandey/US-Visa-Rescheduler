@@ -3,9 +3,19 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 from time import sleep
-from settings import TEST_MODE
+import json
+#from settings import TEST_MODE
 
-def legacy_reschedule(driver):
+# Load settings from settings.json
+def load_settings():
+    with open('settings.json', 'r') as f:
+        return json.load(f)
+
+settings = load_settings()
+
+TEST_MODE = settings.get("TEST_MODE")
+
+def legacy_reschedule(driver) -> None:
     """
     Attempts to reschedule an appointment using a web automation script via Selenium.
 
@@ -34,7 +44,7 @@ def legacy_reschedule(driver):
             )
             date_input.click()
 
-            def next_month():
+            def next_month() -> None:
                 """
                 Clicks the next month button in the datepicker.
                 """
@@ -43,7 +53,7 @@ def legacy_reschedule(driver):
                 )
                 next_button.click()
 
-            def cur_month_ava():
+            def cur_month_ava() -> bool:
                 """
                 Checks if there are any available dates in the current month.
 
@@ -56,7 +66,7 @@ def legacy_reschedule(driver):
                 dates = calendar.find_elements(By.CSS_SELECTOR, "td:not(.ui-datepicker-unselectable)")
                 return len(dates) > 0
 
-            def nearest_ava():
+            def nearest_ava() -> int:
                 """
                 Finds the nearest available month with at least one available date.
 
