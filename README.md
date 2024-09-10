@@ -2,7 +2,10 @@
 
 A python script which tries to find a better date for your visa appointment. Tested on Canada only.
 
-![image](https://github.com/user-attachments/assets/70cfed48-7a37-4371-af37-d6d96f4c9e9f)
+NOTE: You'll probably see System is busy during the day. Use this after 9-10PM EST.
+
+![image](https://github.com/user-attachments/assets/551f7ca8-a2d3-4b57-aa4b-86da78327d49)
+
 
 ## Setup
 
@@ -14,32 +17,21 @@ pip install requests selenium webdriver_manager
 or install it using the options in the GUI
 ```
 
-Modify 'AVAILABLE_DATE_REQUEST_SUFFIX' based on the location. 
-
-89: Calgary
-90: Halifax
-91: Montreal
-92: Ottawa
-93: Quebec City
-94: Toronto
-95: Vancouver
-
-= '/days/94.json?appointments[expedite]=false'  # Toronto
-
-### How to run the script
+### How to use the script
 
 ```sh
 python gui.py
 ```
 
-or download the executable https://github.com/git-ashwinpandey/US-Visa-Rescheduler/releases
+or download the latest release https://github.com/git-ashwinpandey/US-Visa-Rescheduler/releases
 
-See the script in action. Once you're satisfied with its functionality, set `TEST_MODE` to `False` in `settings.py`. For a headless operation, you can also set `SHOW_GUI` to `False` and allow the script to run unattended.
+See the script in action using Test Mode. Test mode stops before confirming appointment selection.
+Once you're satisfied with its functionality, disable Test Mode. 
+For a headless operation, you can enable headless mode and allow the script to run unattended.
 
 ## Caution
 
-It may not always be feasible to reschedule an appointment multiple times. Therefore, it's crucial to use `TEST_MODE = True` for testing purposes and ensure the `LATEST_ACCEPTABLE_DATE` is genuinely acceptable to you.
-
+It may not always be feasible to reschedule an appointment multiple times. Use Testing mode to test the script before actually rescheduling your date.
 
 ## Disclaimer
 
