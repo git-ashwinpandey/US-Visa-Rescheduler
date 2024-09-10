@@ -2,6 +2,8 @@
 
 A python script which tries to find a better date for your visa appointment. Tested on Canada only.
 
+![image](https://github.com/user-attachments/assets/70cfed48-7a37-4371-af37-d6d96f4c9e9f)
+
 ## Setup
 
 Make sure you have booked an appointment on https://ais.usvisa-info.com/en-ca/.
@@ -9,15 +11,28 @@ Make sure you have booked an appointment on https://ais.usvisa-info.com/en-ca/.
 Install dependencies (Python3 is required):
 ```sh
 pip install requests selenium webdriver_manager
+or install it using the options in the GUI
 ```
 
-Modify `settings.py` as per the instructions within the script:
+Modify 'AVAILABLE_DATE_REQUEST_SUFFIX' based on the location. 
+
+89: Calgary
+90: Halifax
+91: Montreal
+92: Ottawa
+93: Quebec City
+94: Toronto
+95: Vancouver
+
+= '/days/94.json?appointments[expedite]=false'  # Toronto
 
 ### How to run the script
 
 ```sh
-python reschedule.py
+python gui.py
 ```
+
+or download the executable https://github.com/git-ashwinpandey/US-Visa-Rescheduler/releases
 
 See the script in action. Once you're satisfied with its functionality, set `TEST_MODE` to `False` in `settings.py`. For a headless operation, you can also set `SHOW_GUI` to `False` and allow the script to run unattended.
 
