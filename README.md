@@ -32,6 +32,8 @@ Modify 'AVAILABLE_DATE_REQUEST_SUFFIX' based on the location.
 python gui.py
 ```
 
+or download the executable https://github.com/git-ashwinpandey/US-Visa-Rescheduler/releases
+
 See the script in action. Once you're satisfied with its functionality, set `TEST_MODE` to `False` in `settings.py`. For a headless operation, you can also set `SHOW_GUI` to `False` and allow the script to run unattended.
 
 ## Caution
