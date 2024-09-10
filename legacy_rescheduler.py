@@ -4,7 +4,6 @@ from selenium.webdriver.support.ui import WebDriverWait, Select
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, ElementClickInterceptedException
 from time import sleep
 import json
-#from settings import TEST_MODE
 
 # Load settings from settings.json
 def load_settings():
