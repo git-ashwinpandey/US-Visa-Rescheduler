@@ -1,4 +1,6 @@
+import re
 import requests
+import json
 from datetime import datetime
 from time import sleep
 
@@ -12,7 +14,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 from request_tracker import RequestTracker
 from reschedule import get_chrome_driver, login
-from settings import *
+
+# Load settings from settings.json
+def load_settings():
+    with open('settings.json', 'r') as f:
+        return json.load(f)
+
+settings = load_settings()
+EARLIEST_ACCEPTABLE_DATE = settings.get("EARLIEST_ACCEPTABLE_DATE")
+LATEST_ACCEPTABLE_DATE = settings.get("LATEST_ACCEPTABLE_DATE")
+NEW_SESSION_AFTER_FAILURES = int(settings.get("NEW_SESSION_AFTER_FAILURES", 5))
+NEW_SESSION_DELAY = int(settings.get("NEW_SESSION_DELAY", 120))
+TIMEOUT = int(settings.get("TIMEOUT", 10))
+PAYMENT_PAGE_URL = settings.get("PAYMENT_PAGE_URL")
+FAIL_RETRY_DELAY = int(settings.get("FAIL_RETRY_DELAY", 30))
 
 def get_dates_from_payment_page(driver: WebDriver) -> tuple[list, list]:
     """
