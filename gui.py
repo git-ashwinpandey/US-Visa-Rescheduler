@@ -32,7 +32,7 @@ class SettingsGUI:
                 "USER_PASSWORD": "",
                 "EARLIEST_ACCEPTABLE_DATE": date_start,
                 "LATEST_ACCEPTABLE_DATE": date_end,
-                "SHOW_GUI": True,
+                "HEADLESS_MODE": False,
                 "TEST_MODE": True,
                 "DETACH": True,
                 "NEW_SESSION_AFTER_FAILURES": 5,
