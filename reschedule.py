@@ -29,7 +29,7 @@ USER_EMAIL = settings.get("USER_EMAIL")
 USER_PASSWORD = settings.get("USER_PASSWORD")
 EARLIEST_ACCEPTABLE_DATE = settings.get("EARLIEST_ACCEPTABLE_DATE")
 LATEST_ACCEPTABLE_DATE = settings.get("LATEST_ACCEPTABLE_DATE")
-SHOW_GUI = settings.get("SHOW_GUI")
+HEADLESS_MODE = settings.get("HEADLESS_MODE")
 TEST_MODE = settings.get("TEST_MODE")
 DETACH = settings.get("DETACH")
 NEW_SESSION_AFTER_FAILURES = int(settings.get("NEW_SESSION_AFTER_FAILURES", 5))
@@ -55,7 +55,7 @@ def get_chrome_driver() -> WebDriver:
       based on the settings.
     """
     options = webdriver.ChromeOptions()
-    if not SHOW_GUI:
+    if not HEADLESS_MODE:
         options.add_argument("headless")
         options.add_argument("window-size=1920x1080")
         options.add_argument("disable-gpu")
