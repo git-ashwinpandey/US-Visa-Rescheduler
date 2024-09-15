@@ -30,6 +30,7 @@ class SettingsGUI:
             return {
                 "USER_EMAIL": "",
                 "USER_PASSWORD": "",
+                "SELECTED_CITY": "Toronto",
                 "EARLIEST_ACCEPTABLE_DATE": date_start,
                 "LATEST_ACCEPTABLE_DATE": date_end,
                 "HEADLESS_MODE": False,
@@ -45,10 +46,7 @@ class SettingsGUI:
                 "LOGIN_URL": "https://ais.usvisa-info.com/en-ca/niv/users/sign_in",
                 "AVAILABLE_DATE_REQUEST_SUFFIX": "/days/94.json?appointments[expedite]=false",
                 "APPOINTMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/appointment",
-                "PAYMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/payment",
-                "REQUEST_HEADERS": {
-                    "X-Requested-With": "XMLHttpRequest",
-                }
+                "PAYMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/payment"
             }
 
     def save_settings(self):
@@ -58,7 +56,7 @@ class SettingsGUI:
             "USER_PASSWORD": self.user_password.get(),
             "EARLIEST_ACCEPTABLE_DATE": self.earliest_date.get(),
             "LATEST_ACCEPTABLE_DATE": self.latest_date.get(),
-            "SHOW_GUI": self.show_gui.get(),
+            "HEADLESS_MODE": self.headless_mode.get(),
             "TEST_MODE": self.test_mode.get(),
             "SELECTED_CITY": self.selected_city.get()
         }
@@ -91,7 +89,7 @@ class SettingsGUI:
 
         selected_city_value = city_values.get(self.selected_city.get(), 94)
         settings["AVAILABLE_DATE_REQUEST_SUFFIX"] = f"/days/{selected_city_value}.json?appointments[expedite]=false"
-
+    
         # Save settings to file
         with open('settings.json', 'w') as f:
             json.dump(settings, f, indent=4)
@@ -120,8 +118,8 @@ class SettingsGUI:
 
         # Other Settings
         ttk.Label(self.master, text="Other Settings", font=("TkDefaultFont", 12, "bold")).grid(row=12, column=0, columnspan=2, pady=10)
-        self.show_gui = tk.BooleanVar(value=self.settings.get("SHOW_GUI", True))
-        ttk.Checkbutton(self.master, text="Headless mode", variable=self.show_gui).grid(row=13, column=0, columnspan=2, pady=2)
+        self.headless_mode = tk.BooleanVar(value=self.settings.get("HEADLESS_MODE", False))
+        ttk.Checkbutton(self.master, text="Headless mode", variable=self.headless_mode).grid(row=13, column=0, columnspan=2, pady=2)
 
         self.test_mode = tk.BooleanVar(value=self.settings.get("TEST_MODE", True))
         ttk.Checkbutton(self.master, text="Test Mode", variable=self.test_mode).grid(row=14, column=0, columnspan=2, pady=2)
@@ -216,10 +214,7 @@ class SettingsGUI:
             "LOGIN_URL": "https://ais.usvisa-info.com/en-ca/niv/users/sign_in",
             "AVAILABLE_DATE_REQUEST_SUFFIX": "/days/94.json?appointments[expedite]=false",
             "APPOINTMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/appointment",
-            "PAYMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/payment",
-            "REQUEST_HEADERS": {
-                "X-Requested-With": "XMLHttpRequest",
-            }
+            "PAYMENT_PAGE_URL": "https://ais.usvisa-info.com/en-ca/niv/schedule/{id}/payment"
         }
 
         self.dev_vars = {}
