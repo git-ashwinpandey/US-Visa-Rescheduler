@@ -43,7 +43,9 @@ LOGIN_URL = settings.get("LOGIN_URL")
 AVAILABLE_DATE_REQUEST_SUFFIX = settings.get("AVAILABLE_DATE_REQUEST_SUFFIX")
 APPOINTMENT_PAGE_URL = settings.get("APPOINTMENT_PAGE_URL")
 PAYMENT_PAGE_URL = settings.get("PAYMENT_PAGE_URL")
-REQUEST_HEADERS = settings.get("REQUEST_HEADERS")
+REQUEST_HEADERS = {
+    "X-Requested-With": "XMLHttpRequest"
+}
 
 
 def get_chrome_driver() -> WebDriver:
@@ -55,7 +57,7 @@ def get_chrome_driver() -> WebDriver:
       based on the settings.
     """
     options = webdriver.ChromeOptions()
-    if not HEADLESS_MODE:
+    if HEADLESS_MODE:
         options.add_argument("headless")
         options.add_argument("window-size=1920x1080")
         options.add_argument("disable-gpu")
@@ -134,11 +136,8 @@ def get_available_dates(driver: WebDriver, request_tracker: RequestTracker) -> l
     """
     request_tracker.log_retry()
     request_tracker.retry()
-    #print(request_tracker)
     current_url = driver.current_url
-    #print(current_url)
     request_url = current_url + AVAILABLE_DATE_REQUEST_SUFFIX
-    #print(request_url)
     request_header_cookie = "".join(
         [f"{cookie['name']}={cookie['value']};" for cookie in driver.get_cookies()]
     )
@@ -147,7 +146,6 @@ def get_available_dates(driver: WebDriver, request_tracker: RequestTracker) -> l
     request_headers["User-Agent"] = driver.execute_script("return navigator.userAgent")
     try:
         response = requests.get(request_url, headers=request_headers)
-        #print(response)
     except Exception as e:
         print("Get available dates request failed: ", e)
         return None
