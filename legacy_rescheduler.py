@@ -13,6 +13,7 @@ def load_settings():
 settings = load_settings()
 
 TEST_MODE = settings.get("TEST_MODE")
+SELECTED_CITY = settings.get("SELECTED_CITY")
 
 def legacy_reschedule(driver) -> None:
     """
@@ -37,11 +38,22 @@ def legacy_reschedule(driver) -> None:
         try:
             driver.refresh()
             
+            # Selects the city
+            city_select = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "appointments_consulate_appointment_facility_id"))
+            )
+            select = Select(city_select)
+            print(select)
+            select.select_by_visible_text(SELECTED_CITY)
+
             # Wait for and click the date input field
             date_input = WebDriverWait(driver, 10).until(
                 EC.element_to_be_clickable((By.ID, "appointments_consulate_appointment_date"))
             )
             date_input.click()
+
+
+                
 
             def next_month() -> None:
                 """
@@ -79,10 +91,11 @@ def legacy_reschedule(driver) -> None:
                 while not cur_month_ava():
                     next_month()
                     ava_in += 1
-                    if ava_in > 16: 
+                    if ava_in > 32: 
                         raise Exception("No available dates found within 12 months")
                 return ava_in
 
+            
             available_in_months = nearest_ava()
 
             # Select the first available date
